@@ -1,0 +1,23 @@
+<div class="jumbotron text-center gradient">
+  <h1>BATTLESHIP</h1>
+
+  <h2>Player 2</h2>
+  <div class="container-fluid">
+    <div class="row" ng-repeat="row in player2Rows track by $id(row)">
+      <div class="col-xs-1"
+        ng-repeat="cell in row.cells track by cell.id"
+        ng-click="turn($index, $parent.$index)">
+        <div class="cell {{cell.style}}"></div>
+      </div>
+    </div>
+  </div>
+  <h2>Player 1</h2>
+  <div class="container-fluid">
+    <div class="row" ng-repeat="row in player1Rows track by $id(row)">
+      <div class="col-xs-1"
+        ng-repeat="cell in row.cells track by cell.id">
+        <div class="cell {{cell.style}}"><span>{{cell.boat}}</span></div>
+      </div>
+    </div>
+  </div>
+</div>
