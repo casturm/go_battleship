@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-martini/martini"
-	"html/template"
 	"io/ioutil"
 	"net/http"
 )
@@ -69,22 +68,12 @@ func (g *Game) gameOver() bool {
 	return false
 }
 
-var index = template.Must(template.ParseFiles(
-	"templates/_base.html",
-	"templates/index.html",
-))
-
 func main() {
 	var thisGame Game
 	m := martini.Classic()
-	static := martini.Static("client/app", martini.StaticOptions{Fallback: "/index.html", Exclude: "/api/v"})
+	static := martini.Static("ui/app", martini.StaticOptions{Fallback: "/index.html", Exclude: "/api/v"})
 	m.NotFound(static, http.NotFound)
 
-	m.Get("/hello", func(w http.ResponseWriter, req *http.Request) {
-		if err := index.Execute(w, nil); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	})
 	m.Post("/api/game", func() (int, string) {
 		thisGame = newGame()
 		fmt.Println("new game:", thisGame)
