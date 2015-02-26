@@ -13,6 +13,41 @@
   </div>
   <h2>Player 1</h2>
   <div class="container-fluid">
+  <form name="ship" class="form form-horizontal" role="form" ng-submit="addShip(ship.$valid)" novalidate>
+
+    <div class="form-group" ng-class="{ 'has-error' : submitted && Ship.LocationX.$invalid }">
+      <div class="col-sm-12">
+        <label class="control-label">X</label>
+        <input type="text" name="x" class="form-control" ng-model="Ship.LocationX" required>
+        <p ng-show="submitted && ship.LocationX.$error.required" class="help-block">choose an x cooridinate</p>
+      </div>
+    </div>
+    <div class="form-group" ng-class="{ 'has-error' : submitted && Ship.LocationY.$invalid }">
+      <div class="col-sm-12">
+        <label class="control-label">Y</label>
+        <input type="text" name="y" class="form-control" ng-model="Ship.LocationY" required>
+        <p ng-show="submitted && ship.LocationY.$error.required" class="help-block">choose an y cooridinate</p>
+      </div>
+    </div>
+    <div class="form-group" ng-class="{ 'has-error' : submitted && Ship.Direction.$invalid }">
+      <div class="col-sm-12">
+        <label class="control-label">Direction</label>
+        <input type="text" name="Direction" class="form-control" ng-model="Ship.Direction" required>
+        <p ng-show="submitted && ship.Direction.$error.required" class="help-block">choose a Direction<p>
+      </div>
+    </div>
+    <div class="form-group" ng-class="{ 'has-error' : submitted && Ship.Size.$invalid }">
+      <div class="col-sm-12">
+        <label class="control-label">Size</label>
+        <input type="text" name="Size" class="form-control" ng-model="Ship.Size" required>
+        <p ng-show="submitted && ship.Size.$error.required" class="help-block">choose a Size<p>
+      </div>
+    </div>
+    <button type="submit" name="play" class="submit active">Add Ship!</button>
+  </form>
+
+  </div>
+  <div class="container-fluid">
     <div class="row" ng-repeat="row in player1Rows track by $id(row)">
       <div class="col-xs-1"
         ng-repeat="cell in row.cells track by cell.id">

@@ -11,9 +11,28 @@ angular.module('myApp.view1', ['ngRoute'])
 
 .controller('View1Ctrl', ['$scope', '$location', 'Game', function($scope, $location, Game) {
   console.log("View1Ctrl " + Game);
-  $scope.start = function() {
-    Game.create().then(function() {
-      $location.path( "/view2" );
-    });
+  $scope.Player = {}
+  $scope.start = function(valid) {
+    console.log("Player.name: " + $scope.Player.name + " " + valid);
+    $scope.submitted = true;
+    if (valid) {
+      Game.player($scope.Player.name).then(function() {
+        console.log("player registered");
+        Game.getPlayers().then(function() {
+          console.log("got players");
+          $scope.players = Game.players()
+          $location.path( "/players" );
+        });
+        //Game.get().then(function() {
+          //if (Game.current()) {
+            //console.log("game started " + Game.current());
+            //$location.path( "/view2" );
+          //}
+          //else {
+            //console.log("waiting for another player")
+          //}
+        //});
+      });
+    }
   }
 }]);

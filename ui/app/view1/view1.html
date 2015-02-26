@@ -1,5 +1,17 @@
-<div class="jumbotron text-center gradient" ng-controller="View1Ctrl">
-  <h1>BATTLESHIP</h1>
+<div class="container">
+  <div class="jumbotron text-center gradient" ng-controller="View1Ctrl">
+    <h1>BATTLESHIP</h1>
+  </div>
+  <form name="player" class="form form-horizontal" role="form" ng-submit="start(player.$valid)" novalidate>
 
-  <button name="start" class="submit active top-buffer" ng-click="start()">Play!</button>
+    <div class="form-group" ng-class="{ 'has-error' : submitted && Player.name.$invalid }">
+      <div class="col-sm-12">
+        <label class="control-label">Name</label>
+        <input type="text" name="name" class="form-control" ng-model="Player.name" required>
+        <p ng-show="submitted && player.name.$error.required" class="help-block">Enter your name to play</p>
+      </div>
+    </div>
+    <button type="submit" name="play" class="submit active">Play!</button>
+  </form>
 </div>
+

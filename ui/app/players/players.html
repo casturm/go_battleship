@@ -1,0 +1,18 @@
+<div class="container" ng-controller="PlayersCtrl">
+  <div class="jumbotron text-center gradient" ng-controller="View1Ctrl">
+    <h1>BATTLESHIP</h1>
+  </div>
+  <div class="panel">
+    <div class="panel-heading"><h1>Players</h1></div>
+    <table class="table">
+      <tbody>
+        <tr ng-repeat="player in players">
+          <td><a href="" ng-click="createGame(player.Id)">{{ player.Name }}</a></td>
+        </tr>
+      </tbody>
+      <tfoot>
+      </tfoot>
+    </table>
+    <button type="button" name="reload" class="submit active" ng-click="reload()">Reload!</button>
+  </div>
+</div>

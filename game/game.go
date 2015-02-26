@@ -12,6 +12,8 @@ type Ship struct {
 }
 
 type Player struct {
+	Id     string
+	Name   string
 	Ships  []*Ship
 	Misses []Point
 }

@@ -4,6 +4,7 @@
 angular.module('myApp', [
   'ngRoute',
   'myApp.game',
+  'myApp.players',
   'myApp.view1',
   'myApp.view2',
   'myApp.view3',

@@ -16,10 +16,29 @@ angular.module('myApp.view2', ['ngRoute'])
 
   $scope.turn = function(x,y) {
     console.log("take turn 0");
-    Game.turn(0,x,y).then(function() {
-      console.log("turn complete 0")
-      //console.log(Game.current)
-      //$location.path("/view3");
-    });
+    if (Game.current.gameOn) {
+      Game.turn(0,x,y).then(function() {
+        console.log("turn complete 0")
+        //console.log(Game.current)
+        //$location.path("/view3");
+      });
+    }
+    else {
+      alert("place ships before you can start the game");
+    }
+  }
+
+  $scope.Ship = {}
+  $scope.addShip = function(valid) {
+    $scope.submitted = true;
+    if (valid) {
+      console.log("add ship " + angular.toJson($scope.Ship));
+      Game.addShip($scope.Ship).then(function() {
+        console.log("ship added");
+        //Game.get().then(function() {
+          //console.log("got updated game");
+        //});
+      });
+    }
   }
 }]);
