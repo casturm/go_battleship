@@ -1,12 +1,16 @@
 package game
 
+import (
+	"code.google.com/p/go-uuid/uuid"
+	"fmt"
+)
+
 type Point struct {
 	X int
 	Y int
 }
 
 type Ship struct {
-	Size     int
 	Location []Point
 	Hits     []Point
 }
@@ -44,7 +48,6 @@ func location(size int, direction string, x int, y int) []Point {
 func (s *Ship) Hit(f Point) bool {
 	for _, p := range s.Location {
 		if f == p {
-			s.Hits = append(s.Hits, f)
 			return true
 		}
 	}
@@ -52,12 +55,13 @@ func (s *Ship) Hit(f Point) bool {
 }
 
 func (s *Ship) Sunk() bool {
-	return len(s.Hits) == s.Size
+	return len(s.Hits) == len(s.Location)
 }
 
 func (p *Player) Fire(f Point) *Ship {
 	for _, s := range p.Ships {
 		if s.Hit(f) {
+			s.Hits = append(s.Hits, f)
 			return s
 		}
 	}
@@ -74,7 +78,62 @@ func (p *Player) GameOver() bool {
 	return true
 }
 
-func MakeShip(nose Point, direction string, size int) Ship {
+func MakeShip(nose Point, direction string, size int) *Ship {
 	location := location(size, direction, nose.X, nose.Y)
-	return Ship{size, location, make([]Point, 0)}
+	var ship = new(Ship)
+	ship.Location = location
+	ship.Hits = make([]Point, 0)
+	return ship
+}
+
+type Game struct {
+	Id      string
+	Turn    int
+	Size    int
+	Players []*Player
+	State   string
+}
+
+func NewPlayer(name string) *Player {
+	player := new(Player)
+	player.Id = uuid.New()
+	player.Name = name
+	return player
+}
+
+func NewGame(player1, player2 *Player) Game {
+	fmt.Println("Starting a New Game!")
+
+	player1.Misses = make([]Point, 0, 0)
+	player2.Misses = make([]Point, 0, 0)
+	gamePlayers := [2]*Player{player1, player2}
+
+	return Game{uuid.New(), 0, 10, gamePlayers[0:], "new"}
+}
+
+func (g *Game) RunGameLoop(x int, y int) string {
+	fmt.Println("run game loop")
+	for p, player := range g.Players {
+		fmt.Println("player", p, player)
+	}
+
+	ship := g.Players[g.Turn].Fire(Point{x, y})
+	g.Turn = (g.Turn + 1) % 2
+	if ship != nil {
+		return "hit"
+	} else {
+		return "miss"
+	}
+}
+
+func (g *Game) GameOver() bool {
+	for i, player := range g.Players {
+		if player.GameOver() {
+			fmt.Printf("\nPlayer %v Won!\n\n", (i+1)%2)
+			fmt.Println("GAME OVER!")
+			g.State = "game over"
+			return true
+		}
+	}
+	return false
 }
