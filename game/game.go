@@ -22,27 +22,39 @@ type Player struct {
 	Misses []Point
 }
 
-func location(size int, direction string, x int, y int) []Point {
-	loc := make([]Point, size)
-	switch direction {
-	case "right":
-		for i := 0; i < size; i++ {
-			loc[i] = Point{x + i, y}
-		}
-	case "left":
-		for i := 0; i < size; i++ {
-			loc[i] = Point{x - i, y}
-		}
-	case "up":
-		for i := 0; i < size; i++ {
-			loc[i] = Point{x, y - i}
-		}
-	case "down":
-		for i := 0; i < size; i++ {
-			loc[i] = Point{x, y + i}
-		}
-	}
-	return loc
+type Game struct {
+	Id      string
+	Turn    int
+	Size    int
+	Players []*Player
+	State   string
+}
+
+func MakeShip(nose Point, direction string, size int) *Ship {
+	location := location(size, direction, nose.X, nose.Y)
+	var ship = new(Ship)
+	ship.Location = location
+	ship.Hits = make([]Point, 0)
+	return ship
+}
+
+func NewPlayer(name string) *Player {
+	player := new(Player)
+	player.Id = uuid.New()
+	player.Name = name
+	return player
+}
+
+func NewGame(player1, player2 *Player) Game {
+	fmt.Println("New Game!")
+
+	player1.Misses = make([]Point, 0, 0)
+	player2.Misses = make([]Point, 0, 0)
+	gamePlayers := [2]*Player{player1, player2}
+
+	game := Game{uuid.New(), 0, 10, gamePlayers[0:], "new"}
+
+	return game
 }
 
 func (s *Ship) Hit(f Point) bool {
@@ -78,41 +90,14 @@ func (p *Player) GameOver() bool {
 	return true
 }
 
-func MakeShip(nose Point, direction string, size int) *Ship {
-	location := location(size, direction, nose.X, nose.Y)
-	var ship = new(Ship)
-	ship.Location = location
-	ship.Hits = make([]Point, 0)
+func (p *Player) AddShip(point Point, direction string, size int) *Ship {
+	ship := MakeShip(point, direction, size)
+	p.Ships = append(p.Ships, ship)
 	return ship
 }
 
-type Game struct {
-	Id      string
-	Turn    int
-	Size    int
-	Players []*Player
-	State   string
-}
-
-func NewPlayer(name string) *Player {
-	player := new(Player)
-	player.Id = uuid.New()
-	player.Name = name
-	return player
-}
-
-func NewGame(player1, player2 *Player) Game {
-	fmt.Println("Starting a New Game!")
-
-	player1.Misses = make([]Point, 0, 0)
-	player2.Misses = make([]Point, 0, 0)
-	gamePlayers := [2]*Player{player1, player2}
-
-	return Game{uuid.New(), 0, 10, gamePlayers[0:], "new"}
-}
-
-func (g *Game) RunGameLoop(x int, y int) string {
-	fmt.Println("run game loop")
+func (g *Game) TakeTurn(x, y int) string {
+	fmt.Println("take turn")
 	for p, player := range g.Players {
 		fmt.Println("player", p, player)
 	}
@@ -136,4 +121,19 @@ func (g *Game) GameOver() bool {
 		}
 	}
 	return false
+}
+
+func location(size int, direction string, x int, y int) []Point {
+	loc := make([]Point, size)
+	switch direction {
+	case "right":
+		for i := 0; i < size; i++ {
+			loc[i] = Point{x + i, y}
+		}
+	case "up":
+		for i := 0; i < size; i++ {
+			loc[i] = Point{x, y - i}
+		}
+	}
+	return loc
 }

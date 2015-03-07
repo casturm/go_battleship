@@ -1,18 +1,33 @@
-<div class="container" ng-controller="PlayersCtrl">
-  <div class="jumbotron text-center gradient" ng-controller="View1Ctrl">
-    <h1>BATTLESHIP</h1>
-  </div>
-  <div class="panel">
-    <div class="panel-heading"><h1>Players</h1></div>
-    <table class="table">
-      <tbody>
-        <tr ng-repeat="player in players">
-          <td><a href="" ng-click="createGame(player.Id)">{{ player.Name }}</a></td>
+<h1>BATTLESHIP</h1>
+<div class="panel">
+  <div class="panel-heading"><h1>Players</h1></div>
+  <table class="table">
+    <tbody>
+      <tr ng-repeat="player in players">
+        <td><a href="" ng-click="createGame(player.Id)">{{ player.Name }}</a></td>
+        <td><span ng-if="currentPlayer.Id == player.Id">*</span></td>
+      </tr>
+    </tbody>
+    <tfoot>
+    </tfoot>
+  </table>
+  <button type="button" name="reload" class="submit active" ng-click="reload()">Reload!</button>
+</div>
+<div class="panel">
+  <div class="panel-heading"><h1>Games</h1></div>
+  <table class="table">
+    <tbody>
+      <tr ng-repeat="game in games">
+        <td>{{ game.Players[0].Name }}</td>
+        <td>{{ game.Players[1].Name }}</td>
+        <td>{{ game.State }}</td>
+        <td>{{ game.Turn }}</td>
+        <td><button type="button" name="play" class="submit active" ng-click="play(game.Id)">Play</button>
         </tr>
       </tbody>
       <tfoot>
       </tfoot>
     </table>
-    <button type="button" name="reload" class="submit active" ng-click="reload()">Reload!</button>
+    <button type="button" name="reload" class="submit active" ng-click="reloadGames()">Reload!</button>
   </div>
 </div>

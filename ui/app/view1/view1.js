@@ -16,22 +16,18 @@ angular.module('myApp.view1', ['ngRoute'])
     console.log("Player.name: " + $scope.Player.name + " " + valid);
     $scope.submitted = true;
     if (valid) {
-      Game.player($scope.Player.name).then(function() {
+      Game.newPlayer($scope.Player.name).then(function() {
         console.log("player registered");
         Game.getPlayers().then(function() {
           console.log("got players");
           $scope.players = Game.players()
-          $location.path( "/players" );
+          $scope.currentPlayer = Game.getThisPlayer();
+          Game.getGames().then(function() {
+            console.log("got games");
+            $scope.games = Game.games();
+            $location.path( "/players" );
+          });
         });
-        //Game.get().then(function() {
-          //if (Game.current()) {
-            //console.log("game started " + Game.current());
-            //$location.path( "/view2" );
-          //}
-          //else {
-            //console.log("waiting for another player")
-          //}
-        //});
       });
     }
   }

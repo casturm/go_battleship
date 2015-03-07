@@ -13,14 +13,14 @@ angular.module('myApp.view2', ['ngRoute'])
 
   $scope.player1Rows = Game.rows(0,1);
   $scope.player2Rows = Game.rows(1,0);
+  $scope.player1 = Game.getPlayer(0);
+  $scope.player2 = Game.getPlayer(1);
 
   $scope.turn = function(x,y) {
     console.log("take turn 0");
     if (Game.current.gameOn) {
       Game.turn(0,x,y).then(function() {
         console.log("turn complete 0")
-        //console.log(Game.current)
-        //$location.path("/view3");
       });
     }
     else {
@@ -35,9 +35,6 @@ angular.module('myApp.view2', ['ngRoute'])
       console.log("add ship " + angular.toJson($scope.Ship));
       Game.addShip($scope.Ship).then(function() {
         console.log("ship added");
-        //Game.get().then(function() {
-          //console.log("got updated game");
-        //});
       });
     }
   }

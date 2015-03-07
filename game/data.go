@@ -8,8 +8,10 @@ import (
 type DB interface {
 	FindAllPlayers() []*Player
 	FindPlayer(id string) *Player
+	FindPlayerByName(name string) (*Player, bool)
 	FindGame(id string) *Game
 	SaveGame(game *Game) error
+	FindAllGames() []*Game
 	SavePlayer(player *Player) error
 }
 
@@ -39,6 +41,19 @@ func (TheDB *gameDB) FindAllPlayers() []*Player {
 	return all
 }
 
+func (TheDB *gameDB) FindPlayerByName(name string) (*Player, bool) {
+	fmt.Println("find player by name", name)
+	//TheDB.RLock()
+	//defer TheDB.Unlock()
+	var player = new(Player)
+	for _, value := range TheDB.p {
+		if value.Name == name {
+			return value, true
+		}
+	}
+	return player, false
+}
+
 func (TheDB *gameDB) FindPlayer(id string) *Player {
 	//TheDB.RLock()
 	//defer TheDB.Unlock()
@@ -51,6 +66,16 @@ func (TheDB *gameDB) FindGame(id string) *Game {
 	return TheDB.g[id]
 }
 
+func (TheDB *gameDB) FindAllGames() []*Game {
+	fmt.Println("find all games")
+	//TheDB.RLock()
+	//defer TheDB.Unlock()
+	var all = make([]*Game, 0, 0)
+	for _, value := range TheDB.g {
+		all = append(all, value)
+	}
+	return all
+}
 func (TheDB *gameDB) SaveGame(g *Game) error {
 	//TheDB.RLock()
 	//defer TheDB.Unlock()

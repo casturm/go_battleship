@@ -5,10 +5,34 @@ angular.module('myApp.game', [])
   console.log("create Game factory");
   var current;
   var players = []
+  var playersList = []
+  var games = [];
   var thisPlayer;
   var factory = {};
   factory.current = function() {
     return current;
+  };
+  factory.getPlayer = function(player) {
+    return players[player]
+  };
+  factory.getThisPlayer = function() {
+    return thisPlayer;
+  };
+  factory.loadGame = function(gameId) {
+    return $http.get('api/game/' + gameId).then(function (resp) {
+      console.log('  server response: ' + angular.toJson(resp.data));
+      setupGame(resp.data);
+      refresh();
+    });
+  };
+  factory.getGames = function() {
+    return $http.get('api/games').then(function (resp) {
+      console.log('  server response: ' + angular.toJson(resp.data));
+      games = resp.data
+    });
+  };
+  factory.games = function() {
+    return games;
   };
   factory.addShip = function(ship) {
     ship.Player = thisPlayer.Id
@@ -21,13 +45,10 @@ angular.module('myApp.game', [])
         players[0].Ships = []
       }
       players[0].Ships.push(resp.data)
-      refresh(0,current.Size,true);
+      refresh();
     });
   }
-  factory.players = function() {
-    return players;
-  };
-  factory.player = function(name) {
+  factory.newPlayer = function(name) {
     console.log('player ' + name);
     player= {Name: name}
     return $http.post('api/player', player).then(function (resp) {
@@ -35,24 +56,20 @@ angular.module('myApp.game', [])
       thisPlayer = resp.data;
     });
   };
+  factory.players = function() {
+    return playersList;
+  };
   factory.getPlayers = function(name) {
     console.log('getPlayers');
     return $http.get('api/players').then(function (resp) {
       console.log('  server response: ' + angular.toJson(resp.data));
-      players = resp.data;
+      playersList = resp.data;
     });
   };
   factory.createGame = function(opponentId) {
     console.log('create game with thisPlayer ' + thisPlayer.Id + " and " + opponentId);
     var gamePlayers = {Player1: thisPlayer.Id, Player2: opponentId}
     return $http.post('api/game', gamePlayers).then(function (resp) {
-      console.log('  server response: ' + angular.toJson(resp.data));
-      setupGame(resp.data);
-    });
-  };
-  factory.get = function() {
-    console.log('get game');
-    return $http.get('api/game').then(function (resp) {
       console.log('  server response: ' + angular.toJson(resp.data));
       setupGame(resp.data);
     });
@@ -76,16 +93,23 @@ angular.module('myApp.game', [])
   };
   setupGame = function(data) {
     current = data;
+    if (thisPlayer.Id == current.Players[0].Id) {
+      players = current.Players
+    }
+    else {
+      players[0] = current.Players[1]
+      players[1] = current.Players[0]
+    }
     size = current.Size
     current.gameOn = false
 
     // primary player view
-    players[0][0] = setupRows(1,size,false)
-    players[0][1] = setupRows(0,size,true)
+    players[0][0] = setupRows(1)
+    players[0][1] = setupRows(0)
 
     // for the other player's view
-    players[1][0] = setupRows(0,size,false)
-    players[1][1] = setupRows(1,size,true)
+    players[1][0] = setupRows(0)
+    players[1][1] = setupRows(1)
   };
   isBoat = function(player,x,y) {
     var ships = players[player]["Ships"]
@@ -93,7 +117,7 @@ angular.module('myApp.game', [])
       for (i=0; i<ships.length; i++) {
         var ship = ships[i];
         var points = ship["Location"]
-        for (p=0; p<points.length; p++) {
+        for (var p=0; p<points.length; p++) {
           if (points[p]["X"] == x && points[p]["Y"] == y) {
             return true;
           }
@@ -128,28 +152,34 @@ angular.module('myApp.game', [])
     }
     return false;
   };
-  refresh = function(player,size,showBoats) {
-    for (y=0; y<size; y++) {
-      for (x=0; x<size; x++) {
-        cell = factory.rows(player,1)[y].cells[x]
-        if (current.gameOn) {
-          if (this.isHit(player,x,y)) {
-            cell.style = "hit"
+  refresh = function() {
+    size = current.Size;
+    for (p=0; p<2; p++) {
+      for (b=0; b<2; b++) {
+        for (y=0; y<size; y++) {
+          for (x=0; x<size; x++) {
+            cell = factory.rows(p,b)[y].cells[x]
+            if (current.gameOn) {
+              if (this.isHit(p,x,y)) {
+                cell.style = "hit"
+              }
+              else if (this.isMiss(p,x,y)) {
+                cell.style = "miss"
+              }
+            }
+            if (b == 1 && this.isBoat(p,x,y)) {
+              cell.boat = "B"
+            }
+            else {
+              cell.boat = ""
+            }
           }
-          else if (this.isMiss(player,x,y)) {
-            cell.style = "miss"
-          }
-        }
-        if (showBoats && this.isBoat(player,x,y)) {
-          cell.boat = "B"
-        }
-        else {
-          cell.boat = ""
         }
       }
     };
   };
-  setupRows = function(player,size,showBoats) {
+  setupRows = function(player) {
+    size = current.Size;
     var rows = new Array(size);
     for (y=0; y<size; y++) {
       row = {}

@@ -13,13 +13,14 @@ angular.module('myApp.view3', ['ngRoute'])
 
   $scope.player1Rows = Game.rows(0,0);
   $scope.player2Rows = Game.rows(1,1);
+  $scope.player1 = Game.getPlayer(0);
+  $scope.player2 = Game.getPlayer(1);
+
 
   $scope.turn = function(x,y) {
     console.log("take turn 1");
     Game.turn(1,x,y).then(function() {
       console.log("turn complete 1")
-      //console.log(Game.current)
-      //$location.path("/view2");
     });
   }
 }]);

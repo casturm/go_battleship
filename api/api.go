@@ -19,6 +19,16 @@ func GetGame(params martini.Params, req *http.Request, db game.DB) (int, string)
 	return 200, string(gameJson)
 }
 
+func GetGames(params martini.Params, req *http.Request, db game.DB) (int, string) {
+	games := db.FindAllGames()
+	gamesJson, err := json.Marshal(games)
+	if err != nil {
+		return http.StatusInternalServerError, "failed to marshal result to JSON data"
+	}
+
+	return 200, string(gamesJson)
+}
+
 func AddShip(params martini.Params, req *http.Request, db game.DB) (int, string) {
 	defer req.Body.Close()
 
@@ -47,8 +57,7 @@ func AddShip(params martini.Params, req *http.Request, db game.DB) (int, string)
 
 	player := db.FindPlayer(shipRequest.Player)
 	point := game.Point{shipRequest.LocationX, shipRequest.LocationY}
-	ship := game.MakeShip(point, shipRequest.Direction, shipRequest.Size)
-	player.Ships = append(player.Ships, ship)
+	ship := player.AddShip(point, shipRequest.Direction, shipRequest.Size)
 
 	shipJson, err := json.Marshal(ship)
 	if err != nil {
@@ -81,10 +90,14 @@ func AddPlayer(params martini.Params, req *http.Request, db game.DB) (int, strin
 	}
 	fmt.Println("NewPlayerRequest", playerRequest)
 
-	player := game.NewPlayer(playerRequest.Name)
-	fmt.Println("new player", player)
-	db.SavePlayer(player)
-
+	player, found := db.FindPlayerByName(playerRequest.Name)
+	if !found {
+		player = game.NewPlayer(playerRequest.Name)
+		fmt.Println("new player", player)
+		db.SavePlayer(player)
+	} else {
+		fmt.Println("found existing player", player)
+	}
 	playerJson, err := json.Marshal(player)
 	if err != nil {
 		return http.StatusInternalServerError, "failed to marshal players to JSON data"
@@ -105,7 +118,7 @@ func GetPlayers(params martini.Params, req *http.Request, db game.DB) (int, stri
 	return 200, string(playersJson)
 }
 
-func AddGame(params martini.Params, req *http.Request, db game.DB) (int, string) {
+func MakeGame(params martini.Params, req *http.Request, db game.DB) (int, string) {
 	defer req.Body.Close()
 
 	fmt.Println("post /game params", params)
@@ -129,15 +142,18 @@ func AddGame(params martini.Params, req *http.Request, db game.DB) (int, string)
 	}
 	fmt.Println("new game with ", gamePlayers)
 
-	thisGame := game.NewGame(db.FindPlayer(gamePlayers.Player1), db.FindPlayer(gamePlayers.Player2))
-	fmt.Println("new game:", thisGame)
-	db.SaveGame(&thisGame)
-	gameJson, err := json.Marshal(&thisGame)
+	player1 := db.FindPlayer(gamePlayers.Player1)
+	player2 := db.FindPlayer(gamePlayers.Player2)
+	theGame := game.NewGame(player1, player2)
+	fmt.Println("new game:", theGame)
+	db.SaveGame(&theGame)
+
+	json, err := json.Marshal(&theGame)
 	if err != nil {
-		return http.StatusInternalServerError, "failed to marshal game to JSON data"
+		return http.StatusInternalServerError, "failed to marshal to JSON data"
 	}
 
-	return 200, string(gameJson)
+	return 200, string(json)
 }
 
 func TakeTurn(params martini.Params, req *http.Request, db game.DB) (int, string) {
@@ -173,7 +189,7 @@ func TakeTurn(params martini.Params, req *http.Request, db game.DB) (int, string
 			fmt.Println("fire! ", playerTurn)
 
 			fmt.Println("runGameLoop on", thisGame)
-			result = thisGame.RunGameLoop(playerTurn.X, playerTurn.Y)
+			result = thisGame.TakeTurn(playerTurn.X, playerTurn.Y)
 		}
 		return 200, result
 	}

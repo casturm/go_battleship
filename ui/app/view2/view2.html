@@ -1,7 +1,6 @@
+<h1>BATTLESHIP</h1>
 <div class="jumbotron text-center gradient">
-  <h1>BATTLESHIP</h1>
-
-  <h2>Player 2</h2>
+  <h2>{{ player2.Name }}</h2>
   <div class="container-fluid">
     <div class="row" ng-repeat="row in player2Rows track by $id(row)">
       <div class="col-xs-1"
@@ -11,7 +10,7 @@
       </div>
     </div>
   </div>
-  <h2>Player 1</h2>
+  <h2>{{ player1.Name }}</h2>
   <div class="container-fluid">
   <form name="ship" class="form form-horizontal" role="form" ng-submit="addShip(ship.$valid)" novalidate>
 

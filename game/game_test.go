@@ -4,6 +4,32 @@ import (
 	"testing"
 )
 
+func TestMakeShipUp(t *testing.T) {
+	ship := MakeShip(Point{1, 2}, "up", 3)
+	if len(ship.Location) != 3 {
+		t.Error("Expected len 3")
+	}
+	if (ship.Location[0] != Point{1, 2}) {
+		t.Error("wrong point at index 0", ship.Location)
+	}
+	if (ship.Location[1] != Point{1, 1}) {
+		t.Error("wrong point at index 1", ship.Location)
+	}
+	if (ship.Location[2] != Point{1, 0}) {
+		t.Error("wrong point at index 2", ship.Location)
+	}
+	if len(ship.Hits) != 0 {
+		t.Error("len Hits is not 0", ship.Hits)
+	}
+}
+
+func TestNewPlayer(t *testing.T) {
+	player := NewPlayer("testplayer")
+	if player.Name != "testplayer" {
+		t.Error("Expected testplayer for Name")
+	}
+}
+
 func TestShipHit(t *testing.T) {
 	for hy := 0; hy < 10; hy++ {
 		for hx := 0; hx < 10; hx++ {
